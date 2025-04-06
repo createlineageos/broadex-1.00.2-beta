@@ -1,0 +1,130 @@
+DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BroadBoot Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+    }
+
+    .terminal {
+      max-width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .output {
+      white-space: pre-wrap;
+    }
+
+    .input-line {
+      display: flex;
+      margin-top: 5px;
+    }
+
+    .prompt {
+      color: #58a6ff;
+    }
+
+    input {
+      background: transparent;
+      border: none;
+      color: #c9d1d9;
+      flex: 1;
+      outline: none;
+      font-family: monospace;
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .terminal {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal" id="terminal">
+    <div class="output" id="output">
+      BROADBOOT/BECENTEDEST 1.0 (READCOMM 110)<br>
+      Type <span class="prompt">help</span> to get list of commands.
+    </div>
+    <div class="input-line">
+      <span class="prompt">$&nbsp;</span>
+      <input type="text" id="cmdInput" autofocus />
+    </div>
+  </div>
+
+  <script>
+    const output = document.getElementById("output");
+    const input = document.getElementById("cmdInput");
+
+    const firmware = "broadex 1.00.2 Web";
+    const broadcomm_device = "READCOMM 110";
+    const core_level = "1 ROM";
+    let sessionName = "default";
+    let deviceName = "READCOMM 110";
+
+    function addOutput(text) {
+      output.innerHTML += "<br>" + text;
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        const cmd = input.value.trim();
+        addOutput("$ " + cmd);
+        input.value = "";
+
+        switch(cmd.toLowerCase()) {
+          case "sysclose":
+            addOutput("SYSCLOSE: SHUTTING DOWN...");
+            break;
+          case "sysfetch":
+            addOutput(`Firmware/ROM: ${firmware}, Broadcomm device: ${broadcomm_device}, Core-level: ${core_level}`);
+            break;
+          case "restart --session":
+            addOutput("Rebooting session...");
+            break;
+          case "help":
+            addOutput("restart --session, sysfetch, sysclose, setname, device, setdevname, clear, timeinfo");
+            break;
+          case "device":
+            addOutput(deviceName);
+            break;
+          case "clear":
+            output.innerHTML = '';
+            break;
+          case "timeinfo":
+            addOutput("Current time: " + new Date().toLocaleString());
+            break;
+          case "setname":
+            const newName = prompt("Session name:");
+            if (newName) {
+              sessionName = newName;
+              addOutput(`${sessionName} selected successfully`);
+            }
+            break;
+          case "setdevname":
+            const newDev = prompt("Device name:");
+            if (newDev) {
+              deviceName = newDev;
+              addOutput(`${deviceName} selected successfully`);
+            }
+            break;
+          default:
+            addOutput(`Command ${cmd} not found, type help to get list of commands.`);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
